@@ -1,0 +1,74 @@
+---
+title: "r-multivariable"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+data(diamonds)
+str(diamonds)
+```
+
+
+##plot a histogram of diamonds price 
+```{r cars}
+qplot(data=diamonds, x= price, fill = cut)+
+  scale_x_log10()+
+  scale_fill_brewer(type="qual")+
+  facet_wrap(~color, ncol=3)
+  
+```
+
+## scatterplot of diamond price v.s. table and
+
+```{r}
+ggplot(aes(x=table, y=price, color = cut),
+       data= diamonds)+
+  geom_point()+
+  scale_fill_brewer(type="qual")
+
+```
+##scaterplot price and volume 
+```{r}
+diamonds=transform(diamonds, volume = x* y*z)
+ggplot(aes(x=volume, y=price, color =clarity),
+       data=diamonds)+
+  scale_y_log10()+
+  scale_color_brewer(type="div")+
+  geom_point()
+```
+##create new variable called "prop_initiated"
+```{r}
+setwd('~/Downloads')
+pf=read.csv("pseudo_facebook.tsv", sep="\t")
+str(pf)
+pf=transform(pf, prop_initiated = friendships_initiated/friend_count)
+summary(pf$prop_initiated)
+```
+##plot median proportion of friendships initiated vs. tenure
+```{r}
+pf$year_joined = 2014-pf$tenure/365
+pf$year_joined.bucket = cut(pf$year_joined, c(2004, 2009, 2011, 2012, 2014))
+```
+##plotting
+```{r}
+ggplot(aes(x=tenure, y=prop_initiated),
+       data=subset(pf, !is.na(year_joined.bucket)))+
+         geom_line(aes(color =year_joined.bucket), stat="summary", fun.y=median )
+```
+##smooth prop_initiated
+```{r}
+ggplot(aes(x=tenure, y=prop_initiated),
+       data=subset(pf, !is.na(year_joined.bucket)))+
+         geom_smooth(aes(color =year_joined.bucket), stat="summary", fun.y=mean )
+```
+##scatter plot of price/carat v.s. cut
+```{r}
+ggplot(aes(x=cut, y=price/carat,color = color),
+       data=diamonds)+
+  geom_point(alpha =0.3)+
+  scale_color_brewer(type="div")+
+  facet_wrap(~clarity, ncol=3)
+```
+
